@@ -1,0 +1,559 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Marks & Grade Calculator</title>
+
+    <style>
+        :root {
+            --bg-deep: #edf6ff;
+            --bg-mid: #dfeeff;
+            --panel: #ffffff;
+            --panel-soft: #f6faff;
+            --card: #ffffff;
+            --primary: #1f6feb;
+            --primary-dark: #124dbd;
+            --secondary: #5aa8ff;
+            --secondary-dark: #3d8ef4;
+            --text: #12395f;
+            --text-soft: #3c5f8f;
+            --muted: #6f8bb0;
+            --line: rgba(31, 111, 235, 0.16);
+            --danger: #e25757;
+            --shadow: 0 20px 45px rgba(31, 111, 235, 0.14);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 32px 16px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #f8fbff 0%, #edf5ff 36%, #dfeeff 100%);
+            color: var(--text);
+        }
+
+        .calculator {
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 30px 28px 26px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+        }
+
+        .heading {
+            text-align: center;
+            padding: 12px 0 20px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .heading h1 {
+            margin: 0 0 10px;
+            color: var(--text);
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            letter-spacing: 0.02em;
+        }
+
+        .heading p {
+            margin: 0;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(31, 111, 235, 0.08);
+            color: var(--primary-dark);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-size: 0.74rem;
+        }
+
+        .form-section {
+            margin-top: 24px;
+        }
+
+        .form-section > label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 0.98rem;
+        }
+
+        .form-section input[type="text"],
+        .form-section input[type="number"] {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #ffffff;
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-section input::placeholder {
+            color: var(--muted);
+        }
+
+        .form-section input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.12);
+        }
+
+        .selection {
+            display: flex;
+            gap: 12px 18px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .selection label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: #f6faff;
+            border: 1px solid var(--line);
+            color: var(--text-soft);
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .selection label:hover {
+            transform: translateY(-1px);
+            border-color: rgba(31, 111, 235, 0.5);
+        }
+
+        .selection input {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 26px;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid var(--line);
+        }
+
+        th, td {
+            padding: 14px 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--line);
+        }
+
+        th {
+            background: linear-gradient(180deg, #edf5ff, #dfeeff);
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        tbody tr:last-child th,
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        td {
+            color: var(--text-soft);
+            background: #ffffff;
+        }
+
+        td input {
+            width: 100%;
+            max-width: 110px;
+            margin: 0 auto;
+            padding: 9px 8px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            text-align: center;
+            background: #f9fbff;
+            color: var(--text);
+        }
+
+        .grade {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .average-row th {
+            background: rgba(31, 111, 235, 0.09);
+            color: var(--text);
+            font-size: 0.96rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .actions button {
+            flex: 1;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.98rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            box-shadow: 0 12px 20px rgba(31, 111, 235, 0.18);
+        }
+
+        .actions button:hover {
+            transform: translateY(-1px);
+        }
+
+        .actions button:active {
+            transform: translateY(0);
+        }
+
+        .actions #calculate {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        .actions .submit-btn {
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+        }
+
+        .message {
+            min-height: 22px;
+            margin-top: 18px;
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        @media (max-width: 560px) {
+            .calculator {
+                padding: 20px 16px 18px;
+                border-radius: 16px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            th, td {
+                min-width: 100px;
+                font-size: 0.82rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="calculator">
+
+    <header class="heading">
+        <h1>Student Marks & Grade Calculator</h1>
+        <p>Nashath Hamtha-0102</p>
+    </header>
+
+    <form id="resultForm">
+
+        <div class="form-section">
+            <label for="name">Student Name:</label>
+            <input type="text" id="name"
+                   placeholder="Enter student name">
+        </div>
+
+        <div class="form-section">
+            <label>Gender:</label>
+
+            <div class="selection">
+                <label>
+                    <input type="radio" name="gender" value="Male">
+                    Male
+                </label>
+
+                <label>
+                    <input type="radio" name="gender" value="Female">
+                    Female
+                </label>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label>Choose Course(s):</label>
+
+            <div class="selection">
+                <label>
+                    <input type="checkbox" name="course" value="HNDIT">
+                    HNDIT
+                </label>
+
+                <label>
+                    <input type="checkbox" name="course" value="HNDE">
+                    HNDE
+                </label>
+
+                <label>
+                    <input type="checkbox" name="course" value="HNDA">
+                    HNDA
+                </label>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Marks (0-100)</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>Machine Learning</td>
+                    <td>
+                        <input type="number" class="marks"
+                               min="0" max="100"
+                               step="1" placeholder="Marks">
+                    </td>
+                    <td class="grade">-</td>
+                </tr>
+
+                <tr>
+                    <td>Computer Network</td>
+                    <td>
+                        <input type="number" class="marks"
+                               min="0" max="100"
+                               step="1" placeholder="Marks">
+                    </td>
+                    <td class="grade">-</td>
+                </tr>
+
+                <tr>
+                    <td>Architecture</td>
+                    <td>
+                        <input type="number" class="marks"
+                               min="0" max="100"
+                               step="1" placeholder="Marks">
+                    </td>
+                    <td class="grade">-</td>
+                </tr>
+
+                <tr class="average-row">
+                    <th colspan="2">Average Marks</th>
+                    <th id="average">-</th>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="error" class="message"></div>
+
+        <div class="actions">
+            <button type="button" id="calculate">
+                Calculate
+            </button>
+
+            <button type="button" id="submit" class="submit-btn">
+                Submit
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+
+    // Subject information
+    const subjects = [
+        "Machine Learning",
+        "Computer Network",
+        "Architecture"
+    ];
+
+    const markInputs = document.querySelectorAll(".marks");
+    const gradeCells = document.querySelectorAll(".grade");
+
+
+    // Grade checking method
+    function getGrade(mark) {
+
+        if (mark >= 75) {
+            return "A";
+        }
+
+        if (mark >= 60) {
+            return "B";
+        }
+
+        if (mark >= 40) {
+            return "C";
+        }
+
+        return "D";
+    }
+
+
+    // Collect student information
+    function getStudentDetails() {
+
+        const name = document.getElementById("name").value.trim();
+
+        const gender = document.querySelector(
+            'input[name="gender"]:checked'
+        );
+
+        const courses = Array.from(
+            document.querySelectorAll(
+                'input[name="course"]:checked'
+            )
+        ).map(item => item.value);
+
+        if (name === "") {
+            throw new Error("Please enter the student name.");
+        }
+
+        if (!gender) {
+            throw new Error("Please select the gender.");
+        }
+
+        if (courses.length === 0) {
+            throw new Error("Please select at least one course.");
+        }
+
+        const marks = [];
+
+        markInputs.forEach(input => {
+
+            const value = input.value;
+            const mark = Number(value);
+
+            if (
+                value === "" ||
+                !Number.isInteger(mark) ||
+                mark < 0 ||
+                mark > 100
+            ) {
+                throw new Error(
+                    "Please enter whole-number marks between 0 and 100."
+                );
+            }
+
+            marks.push(mark);
+
+        });
+
+        return {
+            name: name,
+            gender: gender.value,
+            courses: courses,
+            marks: marks
+        };
+    }
+
+
+    // Calculate marks and grades
+    function calculateResults() {
+
+        const errorBox = document.getElementById("error");
+
+        errorBox.textContent = "";
+
+        try {
+
+            const student = getStudentDetails();
+
+            let total = 0;
+            const grades = [];
+
+            student.marks.forEach((mark, index) => {
+
+                total = total + mark;
+
+                const grade = getGrade(mark);
+
+                grades.push(grade);
+
+                gradeCells[index].textContent = grade;
+
+            });
+
+            const average = total / student.marks.length;
+
+            const roundedAverage = Number(average.toFixed(2));
+
+            document.getElementById("average").textContent =
+                roundedAverage;
+
+            student.subjects = subjects;
+            student.grades = grades;
+            student.average = roundedAverage;
+            student.overallGrade = getGrade(average);
+
+            return student;
+
+        } catch (error) {
+
+            errorBox.textContent = error.message;
+
+            gradeCells.forEach(cell => {
+                cell.textContent = "-";
+            });
+
+            document.getElementById("average").textContent = "-";
+
+            return null;
+        }
+    }
+
+
+    // Save student results
+    function submitResults() {
+
+        const studentData = calculateResults();
+
+        if (studentData === null) {
+            return;
+        }
+
+        sessionStorage.setItem(
+            "studentResults",
+            JSON.stringify(studentData)
+        );
+
+        window.location.href = "result.html";
+
+    }
+
+
+    // Button events
+    document.getElementById("calculate")
+        .addEventListener("click", calculateResults);
+
+    document.getElementById("submit")
+        .addEventListener("click", submitResults);
+
+</script>
+
+</body>
+</html>
+ 
